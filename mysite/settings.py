@@ -2,8 +2,8 @@
 import os
 import django.contrib.auth
 import dj_database_url
-db_from_env = dj_database_url.config()
-DATABASES['default'].update(db_from_env)
+
+
 
 django.contrib.auth.LOGIN_URL = '/'
 
@@ -100,7 +100,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (
-    ('css', os.path.join(PROJECT_ROOT , 'css')),
-    ('js', os.path.join(PROJECT_ROOT , 'js')),
-    ('images', os.path.join(PROJECT_ROOT , 'images')),
+    ('css', os.path.join(STATIC_ROOT , 'css')),
+    ('js', os.path.join(STATIC_ROOT , 'js')),
+    ('images', os.path.join(STATIC_ROOT , 'images')),
 )
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
