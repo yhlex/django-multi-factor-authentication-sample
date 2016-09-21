@@ -1,9 +1,15 @@
 
 import os
 import django.contrib.auth
+import dj_database_url
+db_from_env = dj_database_url.config()
+DATABASES['default'].update(db_from_env)
+
 django.contrib.auth.LOGIN_URL = '/'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 SECRET_KEY = 'usty1l$zk$w^+-6uxuk)h4un3we2ko5+(azcr)v_lki(b63w8h'
 
@@ -94,7 +100,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (
-    ('css', os.path.join(STATIC_ROOT , 'css')),
-    ('js', os.path.join(STATIC_ROOT , 'js')),
-    ('images', os.path.join(STATIC_ROOT , 'images')),
+    ('css', os.path.join(PROJECT_ROOT , 'css')),
+    ('js', os.path.join(PROJECT_ROOT , 'js')),
+    ('images', os.path.join(PROJECT_ROOT , 'images')),
 )
