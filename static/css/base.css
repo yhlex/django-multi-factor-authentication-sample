@@ -10,6 +10,7 @@ body {
   color: white;
   font-weight: 300;
 }
+
 body ::-webkit-input-placeholder {
   /* WebKit browsers */
   font-family: 'Source Sans Pro', sans-serif;
@@ -48,13 +49,13 @@ body :-ms-input-placeholder {
 
 }
 .wrapper.form-success .container h1 {
-  -webkit-transform: translateY(10px);
-          transform: translateY(10px);
+  -webkit-transform: translateY(20px);
+          transform: translateY(20px);
 }
 .container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 10% 0;
+  padding: 7% 0;
   height: 400px;
   text-align: center;
 }
@@ -123,4 +124,66 @@ button:hover {
     -webkit-transform: translateY(-700px) rotate(600deg);
             transform: translateY(-700px) rotate(600deg);
   }
+}
+input.radio:empty ~ label {
+
+	position: relative;
+	float: left;
+	line-height: 2em;
+	text-indent: 3em;
+	margin-top: 0.5em;
+	cursor: pointer;
+}
+input.radio:empty ~ label:before {
+
+	position: absolute;
+	display: block;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	content: '';
+	width: 3em;
+	clear:both;
+	border-radius: 1px 2px 2px 1px;
+    border: 1.5px solid darkorange;
+}
+/* toggle hover */
+input.radio:hover:not(:checked) ~ label:before {
+
+	content:'\2714';
+	text-indent: .45em;
+	color: darkgray;
+    font-size:1em;
+
+}
+
+input.radio:hover:not(:checked) ~ label {
+	color: darkgray;
+
+
+}
+
+/* toggle on */
+input.radio:checked ~ label:before {
+	content:'\2714';
+	text-indent: .45em;
+	color: orange;
+    font-size: 1em;
+}
+
+input.radio:checked ~ label {
+	color: orange;
+}
+label {
+  width: 13em;
+  border-radius: 4px;
+  border: 1.5px solid orange;
+    font-size:1.1em;
+}
+div.option {
+	clear: both;
+	margin: 0 110px;
+}
+input.radio:empty {
+	margin-left: -999999px;
 }
