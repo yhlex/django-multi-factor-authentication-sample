@@ -3,6 +3,7 @@ from django.conf.urls import url, include, patterns
 from django.contrib import admin
 from login.views import *
 from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -15,9 +16,4 @@ urlpatterns = [
 
 
 
-]
-
-if not settings.DEBUG:
-    urlpatterns += patterns('',
-        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.PROJECT_ROOT}),
-    )
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
