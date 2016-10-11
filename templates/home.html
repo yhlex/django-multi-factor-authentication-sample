@@ -28,12 +28,17 @@
 
     <div>
         <input type="radio" name="radio" id="radio4" class="radio"/>
-        <label for="radio4">Telepathy</label>
+        <label for="radio4">6-digit Code</label>
     </div>
     </div>
     <br>
-    <button type="button" onclick="window.location.href= ">Send Code</button>
+    <form class='btns' method="get" action = '.'>
     <br>
+        <button type="button" name='sendcode' onclick="window.location.href='/sent/' " >Send</button>
+{#        <input class="codefield" type="text" name="code">#}
+{#        <button name= 'confirmcode' type="button" onclick="window.location.href='/result/' ">Confirm</button>#}
+        <button type="button" onclick="window.location.href='/logout/' ">Logout</button>
+    </form>
     <br>
-    <button type="button" onclick="window.location.href='/logout/' ">Logout</button>
+
 {% endblock %}

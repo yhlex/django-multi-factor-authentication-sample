@@ -188,3 +188,13 @@ div.option {
 input.radio:empty {
 	margin-left: -999999px;
 }
+.btns{
+    margin-top:6.5em;
+
+}
+.option{
+    padding-left:4.5em;
+}
+.codefield{
+    margin-top:1em;
+}
