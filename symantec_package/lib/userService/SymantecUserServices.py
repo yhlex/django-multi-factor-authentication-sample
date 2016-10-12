@@ -21,8 +21,10 @@ class SymantecUserServices:
 
     ###  A function to call the client's authenticateUserWithPush function   *********************************
     def authenticateUserWithPush(self, requestId, userId):
+
         self.client.service.authenticateUserWithPush(requestId=requestId, userId=userId)
-        pass
+
+
 
     def getFieldContent(self,fieldname):
         info_list = self.__str__().split('\n')
