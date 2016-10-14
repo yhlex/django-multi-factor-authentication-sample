@@ -10,16 +10,23 @@
     <script src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
     <script type="text/javascript">
     $(document).ready(function() {
-        var codefield = $('input[name=codefield]')[0];
-        codefield.style.display = 'none';
+        //var codefield = $('input[name=codefield]')[0];
+        //codefield.style.display = 'none';
+
+        var sendcode_button = $('button[name=sendcode]')[0];
+
+        var six_digit_form = $('form[name=six_digit_form]')[0];
+        six_digit_form.style.display = 'none';
 
         $("input[type=radio]").click(function(){
             console.log($('input:checked')[0].id)
             if($('input:checked')[0].id=='radio4'){
-                codefield.style.display = 'block';
+                sendcode_button.style.display = 'none';
+                six_digit_form.style.display = 'block';
             }
             else{
-                codefield.style.display = 'none';
+                sendcode_button.style.display = 'inline';
+                six_digit_form.style.display = 'none';
             }
         });
     });
@@ -45,30 +52,31 @@
     <p> <br>Please Choose Your Preferred Second Factor Authentication Method </p>
     <br>
     <div class="option">
-    <div>
-        <input type="radio" name="radio" id="radio1" class="radio" checked/>
-        <label for="radio1">SMS</label>
-    </div>
+      <div>
+          <input type="radio" name="radio" id="radio1" class="radio" checked/>
+          <label for="radio1">SMS</label>
+      </div>
 
-    <div>
-        <input type="radio" name="radio" id="radio2" class="radio"/>
-        <label for="radio2">Voice Message</label>
-    </div>
+      <div>
+          <input type="radio" name="radio" id="radio2" class="radio"/>
+          <label for="radio2">Voice Message</label>
+      </div>
 
-    <div>
-        <input type="radio" name="radio" id="radio3" class="radio"/>
-        <label for="radio3">Push Notification</label>
-    </div>
+      <div>
+          <input type="radio" name="radio" id="radio3" class="radio"/>
+          <label for="radio3">Push Notification</label>
+      </div>
 
-    <div>
-        <input type="radio" name="radio" id="radio4" class="radio"/>
-        <label for="radio4">6-digit Code</label>
-    </div>
+      <div>
+          <input type="radio" name="radio" id="radio4" class="radio"/>
+          <label for="radio4">6-digit Code</label>
+      </div>
     </div>
     <br>
+
+
     <form class='btns' method="get" action = '.'>
     <br>
-        <input class="codefield" type="text" name="codefield">
         <button type="button" name='sendcode' onclick="window.location.href='/sent/' " >Send</button>
 
 {#        <button name= 'confirmcode' type="button" onclick="window.location.href='/result/' ">Confirm</button>#}
@@ -76,5 +84,9 @@
         <button type="button" onclick="window.location.href='/logout/' ">Logout</button>
     </form>
     <br>
+    <br>
+    <br>
+
+    {% include "six_digit_form.html" %}
 
 {% endblock %}
