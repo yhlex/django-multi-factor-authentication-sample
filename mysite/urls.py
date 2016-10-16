@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
     url(r'^logout/$', logout_page),
     url(r'^sent/$','login.views.send_code'),
+    url(r'^send_6_otp/$','login.views.send_6_otp', name='send_6_otp'),
     url(r'^result/$','login.views.confirm_code')
 
 

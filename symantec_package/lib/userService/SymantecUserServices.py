@@ -13,22 +13,36 @@ class SymantecUserServices:
         self.onBehalfOfAccountId = onBehalfOfAccountId
         self.iaInfo = iaInfo
         self.includePushAttributes = includePushAttributes
+        self.response = None
 
 
     def __str__(self, requestId, userId):
         res = str(self.client.service.authenticateUserWithPush(requestId=requestId, userId=userId))
         return res
 
-    ###  A function to call the client's authenticateUserWithPush function   *********************************
-    def authenticateUserWithPush(self, requestId, userId):
+    ###  Call the client's authenticateUser function
+    def authenticateUser(self, requestId, userId, otpAuthData=None, pin=None, authContext=None):
+        res = self.client.service.authenticateUser(requestId=requestId, userId=userId, otpAuthData=otpAuthData, pin=pin)
+        self.response = str(res)
+        return self.response
 
-        self.client.service.authenticateUserWithPush(requestId=requestId, userId=userId)
+
+    def authenticateCredentials(self, requestId, credentials, otpAuthData=None, activate=None):
+        res = self.client.service.authenticateCredentials(requestId=requestId, credentials=credentials, otpAuthData=otpAuthData)
+        self.response = str(res)
+        print(self.response)
+        pass
+
+    ###  Call the client's authenticateUserWithPush function
+    def authenticateUserWithPush(self, requestId, userId, pin=None, displayParams=None, requestParams=None, authContext=None):
+        res = self.client.service.authenticateUserWithPush(requestId=requestId, userId=userId)
+        self.response = str(res)
+        print(self.response)
+        pass
 
 
-
-    def getFieldContent(self,fieldname):
-        info_list = self.__str__().split('\n')
-
+    def getFieldContent(self, fieldname):
+        info_list = self.response.split('\n')
         for item in info_list:
             if fieldname in item:
                 return item.split('=')[1][1:]

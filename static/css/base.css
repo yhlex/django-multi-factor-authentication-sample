@@ -40,7 +40,7 @@ body :-ms-input-placeholder {
 }
 
 .wrapper {
-  background: black;
+  background: darkslategrey;
   background: -webkit-linear-gradient(top left, black 0%, darkorange 100%);
   background: linear-gradient(to bottom right, black 0%, darkorange 100%);
   position: absolute;
@@ -89,7 +89,7 @@ form input:hover {
 form input:focus {
   background-color: rgba(255, 255, 255, 0.3);
   width: 300px;
-  color: orange;
+  color: white;
 }
 button {
   outline: 0;
@@ -175,25 +175,25 @@ input.radio:checked ~ label:before {
 input.radio:checked ~ label {
 	color: orange;
 }
-label {
-  width: 13em;
-  border-radius: 4px;
-  border: 1.5px solid orange;
+.option label {
+    width: 14em;
+    border-radius: 4px;
+    border: 1.5px solid orange;
     font-size:1.1em;
 }
-div.option {
-	clear: both;
-	margin: 0 110px;
-}
+/*div.option {*/
+	/*clear: both;*/
+	/*margin: 0 110px;*/
+/*}*/
 input.radio:empty {
 	margin-left: -999999px;
 }
-.btns{
-    margin-top:6.5em;
+/*.btns{*/
+    /*margin-top:6.5em;*/
 
-}
+/*}*/
 .option{
-    padding-left:4.5em;
+    display: inline-block;
 }
 .codefield{
     margin-top:1em;

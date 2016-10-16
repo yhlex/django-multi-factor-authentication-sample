@@ -3,13 +3,16 @@ from django.shortcuts import render
 # Create your views here.
 #views.py
 from login.forms import *
+from mysite.forms.SixDigitForm import SixDigitForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from symantec_package import HTTPHandler
+from symantec_package.lib.userService.SymantecUserServices import SymantecUserServices
+from suds.client import Client
 
 global transactionId
 @csrf_protect
@@ -28,26 +31,28 @@ def register(request):
     variables = RequestContext(request, {
     'form': form
     })
- 
+
     return render_to_response(
     'registration/register.html',
     variables,
     )
- 
+
 def register_success(request):
     return render_to_response(
     'registration/success.html',
     )
- 
+
 def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/')
- 
+
 @login_required
 def home(request):
+    form = SixDigitForm()
+    csrfContext = RequestContext(request)
     return render_to_response(
     'home.html',
-    { 'user': request.user }
+    { 'user': request.user, 'form': form }, csrfContext
     )
 
 def send_code(request):
@@ -58,7 +63,7 @@ def send_code(request):
         client = HTTPHandler.setConnection(url)
 
 
-        push_results = client.service.authenticateUserWithPush(requestId='189392', userId='y1196293')
+        push_results = client.service.authenticateUserWithPush(requestId='189392', userId='gabe_phone')
         info_list = str(push_results).split('\n')
         for item in info_list:
             if 'transactionId' in item:
@@ -72,6 +77,30 @@ def send_code(request):
                 return HttpResponse("Succeed")
         return HttpResponseRedirect("/home")
 
+@csrf_protect
+def send_6_otp(request):
+    if (request.method == "POST"):
+        form = SixDigitForm(request.POST)
+        if form.is_valid():
+            #post = form.save(commit=False)
+            otp = form.cleaned_data["six_digit_code"]
+
+
+            userservices_url = 'http://webdev.cse.msu.edu/~morcoteg/Symantec/WSDL/vipuserservices-auth-1.4.wsdl'
+            user_services_client = HTTPHandler.setConnection(userservices_url)
+
+            user_service = SymantecUserServices(user_services_client)
+            authenticate_result = user_service.authenticateUser("push_456", request.user, {"otp": otp })
+            if ("0000" in str(authenticate_result)):
+                return HttpResponse("Success!" +  str(request.user))
+            else:
+                return HttpResponse("Failure..." + str(request.user))
+    else:
+        return HttpResponse("what?!")
+
+    pass
+
+
 def confirm_code(request):
     urls = 'http://webdev.cse.msu.edu/~yehanlin/vip/vipuserservices-query-1.7.wsdl'
     clients = HTTPHandler.setConnection(urls)
@@ -80,4 +109,3 @@ def confirm_code(request):
         return HttpResponse("Succeed")
     else:
         return HttpResponse("Failed")
-
