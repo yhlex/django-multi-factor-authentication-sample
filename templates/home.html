@@ -16,17 +16,21 @@
         var sendcode_button = $('button[name=sendcode]')[0];
 
         var six_digit_form = $('form[name=six_digit_form]')[0];
+        var confirm_button = $('button[name=confirmcode]')[0];
         six_digit_form.style.display = 'none';
-
+        confirm_button.style.display = 'none'
         $("input[type=radio]").click(function(){
             console.log($('input:checked')[0].id)
             if($('input:checked')[0].id=='radio4'){
                 sendcode_button.style.display = 'none';
                 six_digit_form.style.display = 'block';
+                confirm_button.style.display = 'none'
+
             }
             else{
                 sendcode_button.style.display = 'inline';
                 six_digit_form.style.display = 'none';
+                confirm_button.style.display = 'none'
             }
         });
     });
@@ -74,19 +78,22 @@
     </div>
     <br>
 
-
+    {% include "six_digit_form.html" %}
     <form class='btns' method="get" action = '.'>
     <br>
+
         <button type="button" name='sendcode' onclick="window.location.href='/sent/' " >Send</button>
 
-{#        <button name= 'confirmcode' type="button" onclick="window.location.href='/result/' ">Confirm</button>#}
+        <button type="button" name= 'confirmcode' onclick="window.location.href='/result/' ">Confirm</button>
 
         <button type="button" onclick="window.location.href='/logout/' ">Logout</button>
+
     </form>
     <br>
     <br>
     <br>
 
-    {% include "six_digit_form.html" %}
+
+
 
 {% endblock %}
