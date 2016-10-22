@@ -1,3 +1,5 @@
+
+
 class SymantecQueryServices:
 
     def __init__(self, client):
@@ -8,17 +10,35 @@ class SymantecQueryServices:
         res = self.client.service.getUserInfo(requestId=requestId, userId=userId,
                                         onBehalfOfAccountId=onBehalfOfAccountId, iaInfo=iaInfo,
                                         includePushAttributes=includePushAttributes)
-        return str(res)
+        return res
 
-    def pollPushStatus(self, requestId, transactionId):
-        res = self.client.service.pollPushStatus(requestId=requestId, transactionId=transactionId)
+    def pollPushStatus(self, requestId, transactionId, onBehalfOfAccountId=None):
+        res = self.client.service.pollPushStatus(requestId=requestId, onBehalfOfAccountId=onBehalfOfAccountId,transactionId=transactionId)
         self.response = res
         print(self.response)
-        #push_res = clients.service.pollPushStatus(requestId='13498345', transactionId=transactionId)
-        # if ("approved" in str(push_res)):
-	    #    return HttpResponse("Succeed")
-        pass
+        return str(res)
 
+    def getCredentialInfo(self, requestId, credentialId, credentialType="STANDARD_OTP",
+                          includePushAttributes=None, onBehalfOfAccountId=None):
+        res = self.client.service.getCredentialInfo(requestId=requestId, onBehalfOfAccountId=onBehalfOfAccountId,credentialId=credentialId,
+                                                    credentialType=credentialType, includePushAttributes=includePushAttributes)
+        self.response = res
+        print(self.response)
+        return str(res)
+
+    def getServerTime(self, requestId, onBehalfOfAccountId=None):
+        res = self.client.service.getServerTime(requestId=requestId, onBehalfOfAccountId=onBehalfOfAccountId)
+        self.response = res
+        print(self.response)
+        return str(res)
+
+    def getTemporaryPasswordAttributes(self, requestId, userId, onBehalfOfAccountId=None):
+        res = self.client.service.getTemporaryPasswordAttributes(requestId=requestId,
+                                                                                  onBehalfOfAccountId=onBehalfOfAccountId,
+                                                                                  userId=userId)
+        self.response = res
+        print(self.response)
+        return str(res)
 
     def getFieldContent(self, fieldname):
         info_list = self.__str__().split('\n')

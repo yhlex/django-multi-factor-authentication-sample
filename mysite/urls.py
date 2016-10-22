@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^logout/$', logout_page),
     url(r'^sent/$','login.views.send_code'),
     url(r'^send_6_otp/$','login.views.send_6_otp', name='send_6_otp'),
+    url(r'^send_sms/$','login.views.send_sms', name='send_sms'),
+    url(r'^check_sms/$','login.views.check_sms', name='check_sms'),
     url(r'^result/$','login.views.confirm_code')
 
 
