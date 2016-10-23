@@ -5,6 +5,7 @@ from django.shortcuts import render
 from login.forms import *
 from mysite.forms.SixDigitForm import SixDigitForm
 from mysite.forms.SMSForm import SMSForm
+from mysite.forms.NewSymantecUserForm import NewSymantecUserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -17,14 +18,17 @@ from symantec_package.lib.queryService.SymantecQueryServices import SymantecQuer
 from symantec_package.lib.managementService.SymantecManagementServices import SymantecManagementServices
 from suds.client import Client
 
+from django.shortcuts import render
 global transactionId
 
 
 import string
 import random
 import time
+
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
 @csrf_protect
 def register(request):
     if request.method == 'POST':
@@ -35,22 +39,21 @@ def register(request):
             password=form.cleaned_data['password1'],
             email=form.cleaned_data['email']
             )
-            return HttpResponseRedirect('/register/success/')
+            #return HttpResponseRedirect('/register/success/',  context_instance=RequestContext(request))
+            return render(request,'registration/success.html')
     else:
         form = RegistrationForm()
-    variables = RequestContext(request, {
-    'form': form
-    })
+        variables = {'form': form }
 
-    return render_to_response(
-    'registration/register.html',
-    variables,
-    )
+        return render(request, 'registration/register.html', variables)
+    # return render_to_response(
+    # 'registration/register.html',
+    # variables,
+    # )
 
+@csrf_protect
 def register_success(request):
-    return render_to_response(
-    'registration/success.html',
-    )
+    return render_to_response('registration/success.html', context_instance=RequestContext(request))
 
 def logout_page(request):
     logout(request)
@@ -75,8 +78,42 @@ def home(request):
     { 'user': request.user, 'forms': forms, 'form':form}, csrfContext
     )
 
+@login_required
+@csrf_protect
+def getting_started_symantec(request):
+    form = NewSymantecUserForm()
 
+    csrfContext = RequestContext(request)
+    variables = { 'form':form }
+    return render(request, 'getting_started_symantec.html', variables)
+    # return render_to_response(
+    # 'getting_started_symantec.html',
+    # { 'user': request.user, 'form':form }, context_instance=csrfContext
+    # )
 
+@csrf_protect
+def create_user(request):
+    managementservices_url = 'http://webdev.cse.msu.edu/~huynhall/vipuserservices-mgmt-1.7.wsdl'
+    client = HTTPHandler.setConnection(managementservices_url)
+    management_services_object = SymantecManagementServices(client)
+    if (request.method == "POST"):
+        form = NewSymantecUserForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            credential_id = form.cleaned_data["credential_id"]
+            security_code = form.cleaned_data["security_code"]
+
+            user_created = management_services_object.createUser(id_generator(), email)
+            if ("0000" in str(user_created)):
+                added_cred = management_services_object.addCredential(id_generator(), email, credential_id, "STANDARD_OTP",\
+                                                                            security_code)
+                if ("0000" in str(added_cred)):
+                    return HttpResponse("GOOD!")
+                else:
+                    return HttpResponse("Failure...")
+    pass
 
 def send_code(request):
         global transactionId
@@ -202,5 +239,3 @@ def check_sms(request):
             return HttpResponse("what?!")
 
         pass
-
-

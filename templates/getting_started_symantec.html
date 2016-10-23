@@ -1,0 +1,25 @@
+<!-- home.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}Welcome to Django{% endblock %}
+{% block head %}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css '%}">#}
+
+{% endblock %}
+{% block content %}
+    <h1> Welcome {{ user.username }} !!! <br></h1>
+
+    <p> <br>It looks like you haven't enabled Symantec 2FA. Please enter some basic
+    information below to add yourself as Symantec VIP user and some additional credential information:</p>
+    <br>
+
+    {% include "user_info_form.html" %}
+    
+    <br>
+    <br>
+    <br>
+
+
+
+
+{% endblock %}
