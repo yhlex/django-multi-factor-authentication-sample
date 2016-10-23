@@ -28,10 +28,15 @@ class SymantecServices:
         import time
 
         res = ""
+        transaction_id = ""
 
         push = self.userService.authenticateUserWithPush(requestIdPush, userId)
         print (push)
-        transaction_id = self.userService.getFieldContent('transactionId').strip('"')
+        if self.userService.getFieldContent('transactionId') != None:
+            transaction_id = self.userService.getFieldContent('transactionId').strip('"')
+        else:
+            # failed push should return
+            return self.userService.getFieldContent('status')
         isExit = False
         isError = False
 
@@ -78,13 +83,13 @@ class SymantecServices:
     def getUserInfo(self, requestId, userId, onBehalfOfAccountId=None, iaInfo=True, includePushAttributes=True):
         res = self.queryService.getUserInfo(requestId, userId, onBehalfOfAccountId , iaInfo , includePushAttributes )
         self.response = res
-        print(self.response)
+        #print(self.response)
         return str(res)
 
     def pollPushStatus(self, requestId, transactionId):
         res = self.queryService.pollPushStatus( requestId,  transactionId)
         self.response = res
-        print(self.response)
+        #print(self.response)
         return str(res)
 
     def getCredentialInfo(self, requestId, credentialId, credentialType="STANDARD_OTP",
@@ -92,19 +97,19 @@ class SymantecServices:
         res = self.queryService.getCredentialInfo(requestId, credentialId, credentialType,
                           includePushAttributes , onBehalfOfAccountId )
         self.response = res
-        print(self.response)
+        #print(self.response)
         return str(res)
 
     def getServerTime(self, requestId, onBehalfOfAccountId=None):
         res = self.queryService.getServerTime(requestId, onBehalfOfAccountId)
         self.response = res
-        print(self.response)
+        #print(self.response)
         return str(res)
 
     def getTemporaryPasswordAttributes(self, requestId, userId, onBehalfOfAccountId=None):
         res = self.queryService.getTemporaryPasswordAttributes(requestId, userId, onBehalfOfAccountId)
         self.response = res
-        print(self.response)
+        #print(self.response)
         return str(res)
 
 # ******************** MANAGEMENT
@@ -113,44 +118,60 @@ class SymantecServices:
         res = self.managementService.sendOtp(requestId, userId, phoneNumber, isGatewayAcctInfo, onBehalfOfAccountId,
                    smsFrom , messageTemplate, gatewayId, gatewayPassword )
 
-        pass
+        self.response = res
+        # print(self.response)
+        return str(res)
 
     # simple create user function. check for tests LOOK AND WRITE SOME TOO if you think needed
     def createUser(self, requestId, userId, onBehalfOfAccountId=None, pin=None, forcePinChange=None):
         res = self.managementService.createUser(requestId, userId, onBehalfOfAccountId , pin , forcePinChange )
+        self.response = res
+        # print(self.response)
         return str(res)
 
     #simple delete user function
     def deleteUser(self, requestId, userId, onBehalfOfAccountId=None):
         res = self.managementService.deleteUser(requestId, userId, onBehalfOfAccountId )
+        self.response = res
+        # print(self.response)
         return str(res)
 
 # ********************USER SERVICE
     def authenticateUser(self, requestId, userId, pin=None, otp=None, authContext=None):
-        self.userService.authenticateUser( requestId,  userId,  pin, otp, authContext)
-        pass
+        res = self.userService.authenticateUser( requestId,  userId,  pin, otp, authContext)
+        self.response = res
+        # print(self.response)
+        return str(res)
 
 
     def authenticateCredentials(self, requestId, credentials, otpAuthData=None, pushAuthData=None, activate=None):
-        self.userService.authenticateCredentials( requestId,  credentials, otpAuthData, pushAuthData, activate)
-        pass
+        res = self.userService.authenticateCredentials( requestId,  credentials, otpAuthData, pushAuthData, activate)
+        self.response = res
+        # print(self.response)
+        return str(res)
 
     #SMS
     def authenticateWithSMS(self, requestId, credentialId_phoneNumber, securityCode, activate=None):
-        self.userService.authenticateCredentials(requestId, credentialId_phoneNumber, securityCode, activate )
+        res = self.userService.authenticateCredentials(requestId, credentialId_phoneNumber, securityCode, activate )
 
-        pass
+        self.response = res
+        # print(self.response)
+        return str(res)
     #Normal 6 digit
     def authenticateWithStandard_OTP(self, requestId, credentialId, securityCode, activate=None):
-        self.userService.authenticateCredentials(requestId, credentialId, securityCode, activate)
+        res = self.userService.authenticateCredentials(requestId, credentialId, securityCode, activate)
 
-        pass
+        self.response = res
+        # print(self.response)
+        return str(res)
 
     ###  Call the client's authenticateUserWithPush function
     def authenticateUserWithPush(self, requestId, userId, pin=None, displayParams=None, requestParams=None, authContext=None):
-        self.userService.authenticateUserWithPush(requestId, userId, pin, displayParams , requestParams , authContext )
+        res = self.userService.authenticateUserWithPush(requestId, userId, pin, displayParams , requestParams , authContext )
         #print(self.response)
-        pass
+        self.response = res
+        # print(self.response)
+        return str(res)
 
 
     def getFieldContent(self, fieldname):

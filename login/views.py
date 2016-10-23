@@ -16,6 +16,7 @@ from symantec_package import HTTPHandler
 from symantec_package.lib.userService.SymantecUserServices import SymantecUserServices
 from symantec_package.lib.queryService.SymantecQueryServices import SymantecQueryServices
 from symantec_package.lib.managementService.SymantecManagementServices import SymantecManagementServices
+from symantec_package.lib.allServices.SymantecServices import SymantecServices
 from suds.client import Client
 
 from django.shortcuts import render
@@ -117,29 +118,37 @@ def create_user(request):
 
 def send_code(request):
         global transactionId
-        url = 'http://webdev.cse.msu.edu/~yehanlin/vip/vipuserservices-auth-1.7.wsdl'
+        urlAuth = 'http://webdev.cse.msu.edu/~yehanlin/vip/vipuserservices-auth-1.7.wsdl'
+        urlMgmt = 'http://webdev.cse.msu.edu/~huynhall/vipuserservices-mgmt-1.7.wsdl'
+        urlQuery = 'http://webdev.cse.msu.edu/~yehanlin/vip/vipuserservices-query-1.7.wsdl'
+        clientAuth = HTTPHandler.setConnection(urlAuth)
+        clientMgmt = HTTPHandler.setConnection(urlMgmt)
+        clientQuery = HTTPHandler.setConnection(urlQuery)
+        # userService = SymantecUserServices(clientAuth)
+        # queryService = SymantecQueryServices(clientQuery)
+        # ManagementService = SymantecManagementServices(clientMgmt)
 
-
-        client = HTTPHandler.setConnection(url)
-
-        urls = 'http://webdev.cse.msu.edu/~yehanlin/vip/vipuserservices-query-1.7.wsdl'
-        clients = HTTPHandler.setConnection(urls)
-        userService = SymantecUserServices(client)
-        queryService = SymantecQueryServices(clients)
-
-        push_results = client.service.authenticateUserWithPush(requestId='189392', userId=str(request.user))
-        info_list = str(push_results).split('\n')
-        for item in info_list:
-            if 'transactionId' in item:
-                transactionId = item.split('=')[1][1:][1:-1]
-
-        while 1:
-            push_res = clients.service.pollPushStatus(requestId='13498345', transactionId=transactionId)
-            if ("approved" in str(push_res)):
-                return render_to_response("succeed.html",)
+        allServices = SymantecServices(clientQuery,clientMgmt,clientAuth)
+        #
+        # push_results = client.service.authenticateUserWithPush(requestId='189392', userId=str(request.user))
+        # info_list = str(push_results).split('\n')
+        # for item in info_list:
+        #     if 'transactionId' in item:
+        #         transactionId = item.split('=')[1][1:][1:-1]
+        #
+        # while 1:
+        #     push_res = clients.service.pollPushStatus(requestId='13498345', transactionId=transactionId)
+        #     if ("approved" in str(push_res)):
+        #         return render_to_response("succeed.html",)
         # if(authenticateUserWithPushThenPolling(userService,queryService, "Push_Test", "PushPollTest","Arren_phone")):
         #     return HttpResponse("Succeed")
-        return HttpResponseRedirect("/home")
+
+        response = allServices.authenticateUserWithPushThenPolling("SampleBankApp_Push123", "SampleBankApp_Polling",
+                                                                   str(request.user),120)
+        if ("7000" in response):
+            return render_to_response("succeed.html")
+
+        return HttpResponseRedirect("/home") # Probably should set a message so that we can see that it failed
 
 @csrf_protect
 def send_6_otp(request):
