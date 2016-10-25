@@ -10,7 +10,7 @@ class SymantecQueryServices:
         res = self.client.service.getUserInfo(requestId=requestId, userId=userId,
                                         onBehalfOfAccountId=onBehalfOfAccountId, iaInfo=iaInfo,
                                         includePushAttributes=includePushAttributes)
-        return res
+        return str(res)
 
     def pollPushStatus(self, requestId, transactionId, onBehalfOfAccountId=None):
         res = self.client.service.pollPushStatus(requestId=requestId, onBehalfOfAccountId=onBehalfOfAccountId,transactionId=transactionId)

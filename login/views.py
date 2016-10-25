@@ -69,15 +69,18 @@ def logout_page(request):
 #     'home.html',
 #     { 'user': request.user, 'form': form }, csrfContext
 #     )
+@csrf_protect
 def home(request):
     forms = SMSForm()
     form = SixDigitForm()
 
     csrfContext = RequestContext(request)
-    return render_to_response(
-    'home.html',
-    { 'user': request.user, 'forms': forms, 'form':form}, csrfContext
-    )
+    variables = { 'form':form, 'forms':forms}
+    return render(request, 'home.html', variables)
+    # return render_to_response(
+    # 'home.html',
+    # { 'user': request.user, 'forms': forms, 'form':form}, csrfContext
+    # )
 
 @login_required
 @csrf_protect
@@ -107,8 +110,8 @@ def create_user(request):
             security_code = form.cleaned_data["security_code"]
 
             user_created = management_services_object.createUser(id_generator(), email)
-            if ("0000" in str(user_created)):
-                added_cred = management_services_object.addCredential(id_generator(), email, credential_id, "STANDARD_OTP",\
+            if ("0000" in str(user_created) and credential_id is not None and security_code is not None):
+                added_cred = management_services_object.addCredentialOtp(id_generator(), email, credential_id, "STANDARD_OTP",\
                                                                             security_code)
                 if ("0000" in str(added_cred)):
                     return HttpResponse("GOOD!")
@@ -158,20 +161,20 @@ def send_6_otp(request):
     user_credentials = queryService.getUserInfo(id_generator(),request.user)[7]
     for item in user_credentials:
         credentialId = item[0]
+
     if (request.method == "POST"):
         form = SixDigitForm(request.POST)
         if form.is_valid():
-            #post = form.save(commit=False)
+
             otp = form.cleaned_data["six_digit_code"]
-
-
-            userservices_url = 'http://webdev.cse.msu.edu/~morcoteg/Symantec/WSDL/vipuserservices-auth-1.4.wsdl'
+            userservices_url = 'http://webdev.cse.msu.edu/~morcoteg/Symantec/WSDL/vipuserservices-auth-1.7.wsdl'
             user_services_client = HTTPHandler.setConnection(userservices_url)
 
             user_service = SymantecUserServices(user_services_client)
-            authenticate_result = user_service.authenticateWithStandard_OTP(id_generator(), credentialId, otp)
+            #authenticate_result = user_service.authenticateWithStandard_OTP(id_generator(), credentialId, otp)
+            authenticate_result = user_service.authenticateUser(id_generator(), request.user.email, otp)
             if ("0000" in str(authenticate_result)):
-                return render_to_response("succeed.html")
+                return HttpResponse("Success!!! " + str(request.user))
             else:
                 return HttpResponse("Failure..." + str(request.user))
     else:

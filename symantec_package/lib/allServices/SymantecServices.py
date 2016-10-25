@@ -2,7 +2,7 @@
 class SymantecServices:
 
     import sys
-    #sys.path.append("/home/oem/PycharmProjects/Securitas_Dev/Securitas") # remove this when finish
+    sys.path.append("/home/oem/PycharmProjects/Securitas_Dev/Securitas") # remove this when finish
 
     from symantec_package.lib.userService.SymantecUserServices import SymantecUserServices
     from symantec_package.lib.queryService.SymantecQueryServices import SymantecQueryServices

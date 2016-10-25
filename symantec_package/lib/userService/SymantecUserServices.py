@@ -23,16 +23,19 @@ class SymantecUserServices:
     #     return res
 
     ###  Call the client's authenticateUser function
-    def authenticateUser(self, requestId, userId, pin=None, otp=None, authContext=None):
-        self.client.service.authenticateUser(requestId=requestId, userId=userId, pin=pin)
-        pass
+    def authenticateUser(self, requestId, userId, securityCode, pin=None, authContext=None):
+        res = self.client.service.authenticateUser(requestId=requestId, userId=userId, otpAuthData={"otp": securityCode},
+                                                   pin=pin, authContext=authContext)
+        self.response = str(res)
+        print(str(res))
+        return str(res)
 
 
     def authenticateCredentials(self, requestId, credentials, otpAuthData=None, pushAuthData=None, activate=None):
         res = self.client.service.authenticateCredentials(requestId=requestId, credentials=credentials, otpAuthData=otpAuthData)
         self.response = str(res)
-        print(self.response)
-        pass
+        # print(self.response)
+        return str(res)
 
     #SMS
     def authenticateWithSMS(self, requestId, credentialId_phoneNumber, securityCode, activate=None):
@@ -41,7 +44,8 @@ class SymantecUserServices:
                                                                        "credentialType": "SMS_OTP"},
                                                           otpAuthData={"otp": securityCode})
         self.response = str(res)
-        return self.response
+         # print(self.response)
+        return str(res)
     #Normal 6 digit
     def authenticateWithStandard_OTP(self, requestId, credentialId, securityCode, activate=None):
         res = self.client.service.authenticateCredentials(requestId=requestId, activate= activate,
@@ -49,14 +53,15 @@ class SymantecUserServices:
                                                                        "credentialType": "STANDARD_OTP"},
                                                           otpAuthData={"otp": securityCode})
         self.response = str(res)
-        return self.response
+        # print(self.response)
+        return str(res)
 
     ###  Call the client's authenticateUserWithPush function
     def authenticateUserWithPush(self, requestId, userId, pin=None, displayParams=None, requestParams=None, authContext=None):
         res = self.client.service.authenticateUserWithPush(requestId=requestId, userId=userId)
         self.response = str(res)
-        print(self.response)
-        pass
+        # print(self.response)
+        return str(res)
 
 
     def getFieldContent(self, fieldname):
