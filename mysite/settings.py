@@ -96,6 +96,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')

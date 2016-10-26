@@ -65,9 +65,9 @@ body :-ms-input-placeholder {
   font-weight: 300;
 }
 form {
-  padding: 20px 0;
+  padding: 10px 0;
   position: relative;
-  z-index: 2;
+  z-index: 4;
 }
 form input {
   outline: 0;
@@ -197,4 +197,26 @@ input.radio:empty {
 }
 .codefield{
     margin-top:1em;
+}
+.checkSMS {
+  outline: 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  width: 300px;
+  border-radius: 3px;
+  padding: 10px 15px;
+  margin: 0 auto 1px auto;
+  display: block;
+  text-align: center;
+  font-size: 18px;
+  color: white;
+  font-weight: 300;
+}
+.checkSMS:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.checkSMS:focus {
+  background-color: rgba(255, 255, 255, 0.3);
+  width: 300px;
+  color: white;
 }
