@@ -1,7 +1,33 @@
 import urllib.request, http.client, socket
 from suds.client import Client
 from suds.transport.http import HttpTransport, Reply, TransportError
+import suds
+from suds.sudsobject import asdict
 
+from suds.sudsobject import asdict
+import json
+from datetime import datetime
+def recursive_asdict(d):
+    """Convert Suds object into serializable format."""
+    out = {}
+    for k, v in asdict(d).items():
+        if type(v) is datetime:
+            v = str(v)
+        if hasattr(v, '__keylist__'):
+            out[k] = recursive_asdict(v)
+        elif isinstance(v, list):
+            out[k] = []
+            for item in v:
+                if hasattr(item, '__keylist__'):
+                    out[k].append(recursive_asdict(item))
+                else:
+                    out[k].append(item)
+        else:
+            out[k] = v
+    return out
+
+def suds_to_json(data):
+    return json.dumps(recursive_asdict(data))
 
 class HTTPSClientAuthHandler(urllib.request.HTTPSHandler):
     def __init__(self, key, cert):
@@ -46,7 +72,7 @@ class HTTPSClientCertTransport(HttpTransport):
 
 import logging
 import sys
-sys.path.append("/Users/hanlinye/Documents/banking-app-example/")
+sys.path.append("/home/oem/PycharmProjects/Securitas_Dev/Securitas")
 from symantec_package.lib.userService.SymantecUserServices import SymantecUserServices
 from symantec_package.lib.queryService.SymantecQueryServices import SymantecQueryServices
 from symantec_package.lib.managementService.SymantecManagementServices import SymantecManagementServices
@@ -73,12 +99,12 @@ management_client = Client(managementservices_url,
          transport = HTTPSClientCertTransport('vip_certificate.crt','vip_certificate.crt'))
 
 #get_user_info_result = query_services_client.service.getUserInfo(requestId="123123", userId="y1196293")
-#print(get_user_info_result)
+
 test_user_services_object = SymantecUserServices(user_services_client)
 test_query_services_object = SymantecQueryServices(query_services_client)
 test_management_services_object = SymantecManagementServices(management_client)
 test_services = SymantecServices(query_services_client, management_client, user_services_client)
-#item = get_user_info_result[7]
+
 #send_push_to_phone_result = test_user_services_object.authenticateUserWithPush("push_123", "gabe_phone")
 #print(test_user_services_object.__str__("push_123", "gabe_phone"))
 
@@ -100,102 +126,136 @@ test_services = SymantecServices(query_services_client, management_client, user_
 ### SMS test
 # user_id = input("\nEnter User ID: ")
 # phoneNumber = input("Enter phone number: ")
-# user_id = "y1196293"
-# phoneNumber = "15177757651"
 # send_SMS = test_management_services_object.sendOtpSMS("SMS_Test", user_id, phoneNumber)
 # print (send_SMS)
+#
+# results_SMS = test_user_services_object.authenticateWithSMS("SMS_Result_Test", phoneNumber, input("\nEnter Security Code: "))
+# print (results_SMS)
 
-#results_SMS = test_user_services_object.authenticateWithSMS("SMS_Result_Test", "15177757651", "186472")
-#print (results_SMS)
 
-#print(test_user_services_object.authenticateUser("push_456", "y1196293", {"OTP" : 775224}))
+# testy = test_query_services_object.getUserInfo("Test12", "Arren_phone")
+# tupleFirsts = test_query_services_object.getPreviousResponseFirstPairs()
+# for value in tupleFirsts:
+#     txt = "[1st Pair: " + value + ", \n\t2nd Pair: " + str(test_query_services_object.getPreviousResponseValue(value)) + "]"
+#     if (value == "credentialBindingDetail"):
+#         break
+#     print (txt)
+
+# print((testy))
+# print(testy['credentialBindingDetail'])
+# print(testy['credentialBindingDetail'][1]['credentialId'])
+# for tup in testy:
+#     print(tup)
+#     print(tup[0])
+#     print(tup[1])
+#     print(type(tup[1]))
+
+# testTime = test_query_services_object.getServerTime("timers")
+# print (testTime)
+# response_json = recursive_asdict(testTime)
+# print(response_json)
+# print(response_json["status"])
+
+# response = test_user_services_object.authenticateCredentialWithPush("push_123", "VSMT16833399", True)
+# response_push = recursive_asdict(response)
+# print(response_push)
+# print(response_push["status"])
+# print (type(testTime))
+
+# response = test_management_services_object.createUser("create_123", "new_user3")
+# response_create = recursive_asdict(response)
+# print(response_create)
+# print(response_create["status"])
+
+# response = test_management_services_object.deleteUser("delete_123", "test_user1")
+# response_delete = recursive_asdict(response)
+# print(response_delete)
+# print(response_delete["status"])
+
+# response = test_management_services_object.addCredentialOtp("add_otp_cred", "new_user3", "VSMT16833399", "STANDARD_OTP", \
+#                                                                             "203472")
+# response_add = recursive_asdict(response)
+# print(response_add)
+# print(response_add["status"])
+
+response = test_management_services_object.removeCredential("remove_123", "new_user3", "VSMT16833399", "STANDARD_OTP")
+response_del = recursive_asdict(response)
+print(response_del)
+print(response_del["status"])
+
+
 # # test new encompassing class
 #services_push = test_services.authenticateUserWithPush("push_123", "Arren_phone")
-#test_services.authenticateUserWithPushThenPolling( "Push_Test", "PushPollTest","Arren_phone")
+# test_services.authenticateUserWithPushThenPolling( "Push_Test", "PushPollTest","Arren_phone")
+
+# credentialPush = test_user_services_object.authenticateCredentialWithPush("pushy123", "VSTZ43724471")
+# print (credentialPush)
+
+# d = dict(http='127.0.0.1:8080')
+# query_services_client.set_options(proxy=d)
+# queryClient = suds.client.Client(query_services_url)
+# d = dict(http='127.0.0.1:8080')
+# queryClient.set_options(proxy=d)
+# print(queryClient)
+# print (query_services_client)
+# testObject = query_services_client.factory.create('ns0:RequestIdType')
+# print(testObject)
+# testObject['requestId']
+# testObject="testy123"
+# print(testObject)
+# testy = query_services_client.service.getServerTime(testObject)
+# print(testy)
 #
-#
-#
-#
-#
-#
-#
+# print(type(testy))
 
+# t = test_query_services_object.getCredentialInfo("getCredit123","VSTZ43724471")
+# print(t)
+# test = [{"requestId":"getCredit123"}, {"credentialId":"VSTZ"}]
+# for i in test:
+#     print(i)
+#     print(i["requestId"])
+#     break
 
-# abcde
-# a ab abc abcd abcde abe abde acde ace ade ae 
-# b bc bcd bcde bde be 
-# c cd cde ce 
-# d de
-# e 
+reply = \
+"""
+          <GetCredentialInfoResponse xmlns="https://schemas.symantec.com/vip/2011/04/vipuserservices">
+             <requestId>getCredentialInfo123</requestId>
+             <status>0000</status>
+             <statusMessage>Success</statusMessage>
+             <credentialId>VSTZ00001337</credentialId>
+             <credentialType>STANDARD_OTP</credentialType>
+             <credentialStatus>ENABLED</credentialStatus>
+             <numBindings>1</numBindings>
+             <userBindingDetail>
+                <userId>test_phone</userId>
+                <userStatus>ACTIVE</userStatus>
+                <bindingDetail>
+                   <bindStatus>ENABLED</bindStatus>
+                   <lastBindTime>2016-09-28T00:42:54.489Z</lastBindTime>
+                   <lastAuthnTime>2016-10-30T06:46:25.236Z</lastAuthnTime>
+                   <lastAuthnId>38A333E53F17B1D6</lastAuthnId>
+                </bindingDetail>
+             </userBindingDetail>
+          </GetCredentialInfoResponse>
 
+"""
+# import xmltodict
+# s = xmltodict.parse(reply)
+# print (s.keys())
+# print(s['GetCredentialInfoResponse'])
 
-def get_all_substrings(input_string):
-  length = len(input_string)
-  return [input_string[i:j+1] for i in range(length) for j in range(i,length)]
-def get_all_substringss(string):
-    length = len(string)+1
-    return [string[x:y] for x in range(length) for y in range(length) if string[x:y]]
+from xml.dom.minidom import parseString
+# dom = parseString(reply)
+# nodes = dom.getElementsByTagName('status')
+# print (nodes[0].firstChild.nodeValue)
 
+def getElementFromTagName(xml, tag, selected=1):
+    nodes = parseString(xml).getElementsByTagName(tag)
+    if len(nodes) <= 0:
+        return ("FAILED to retrieve any elements of the tag: " + str(tag))
 
-# print(get_all_substringss('abc'))
-# print(get_all_substrings('abc'))
+    if selected < 1: # make sure no lower then first tag that appears
+        selected = 1
+    return nodes[selected - 1].firstChild.nodeValue
 
-
-def powerset(s):
-    n = len(s)
-    masks = [1<<j for j in range(n)]
-    print(masks)
-    for i in range(2**n):
-        yield "".join([str(s[j]) for j in range(n) if (masks[j] & i)])
-# if __name__ == '__main__':
-#     for elem in powerset(['a','b','c']):
-#         print(elem)
-#  
-from itertools import *
-def  buildSubsequences( s):
-    l = len(s)
-    res = []
-    for i in range(1,l):
-        temp = list(combinations(s,i))
-        for item in temp:
-            t = ''.join(item)
-            res.append(t)
-    return sorted(res)
-# def  arrangeCoins(coins):
-#     for item in coins:
-#         n=1
-#         while n:
-#             if sum(range(1,n))==item:
-#                 print(n-1)
-#                 break
-#             elif sum(range(1,n))>item:
-#                 print(n-2)
-#                 break
-#             n+=1
-#         print("====" + str(n))
-def arrangeCoins(coins):
-    for item in coins:
-        # for i in range(1,item+1):
-        #     #print("===" +str(item)+"   "+ str(i*(i+1)/2))
-        #     if i*(i+1)/2 == item:
-        #         print(i)
-        #         break
-        #     if i*(i+1)/2 > item:
-        #         print(i-1)
-        #         break
-        
-        print(item*2)
-arrangeCoins([2,5,8,3])
-
-
-
-
-
-
-
-
-
-
-
-    
-#
+# print(getElementFromTagName(reply,"st"))
