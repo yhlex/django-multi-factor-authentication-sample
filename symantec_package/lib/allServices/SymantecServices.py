@@ -44,7 +44,8 @@ class SymantecServices:
             print(transaction_id)
         else:
             # failed push should return
-            return self.userService.getFieldContent('status')
+            return self.userService.status
+
         isExit = False
         isError = False
 
