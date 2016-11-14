@@ -14,23 +14,37 @@
         //codefield.style.display = 'none';
 
         var sendcode_button = $('button[name=sendcode]')[0];
-
         var six_digit_form = $('form[name=six_digit_form]')[0];
         var confirm_button = $('button[name=confirmcode]')[0];
+        var sms_form = $('form[name=sms_form]')[0];
+        var sms_btn = $('input[name=sendsms]')[0];
+
         six_digit_form.style.display = 'none';
-        confirm_button.style.display = 'none'
+        confirm_button.style.display = 'none';
+        sendcode_button.style.display = 'none';
         $("input[type=radio]").click(function(){
             console.log($('input:checked')[0].id)
-            if($('input:checked')[0].id=='radio4'){
-                sendcode_button.style.display = 'none';
+            if($('input:checked')[0].id=='radio1'){
+                sms_btn.style.display = 'block';
+                sms_form.style.display = 'block';
+                six_digit_form.style.display = 'none';
+            }
+            else if($('input:checked')[0].id=='radio4'){
+{#                sendcode_button.style.display = 'none';#}
                 six_digit_form.style.display = 'block';
-                confirm_button.style.display = 'none'
+                confirm_button.style.display = 'none';
+                sms_btn.style.display = 'none';
+                sms_form.style.display = 'none';
+                sendcode_button.style.display = 'none';
 
             }
             else{
                 sendcode_button.style.display = 'inline';
                 six_digit_form.style.display = 'none';
                 confirm_button.style.display = 'none'
+                sms_btn.style.display = 'none';
+                sms_form.style.display = 'none';
+
             }
         });
     });
@@ -53,6 +67,8 @@
     </script>
     <h1> Welcome {{ user.username }} !!! <br></h1>
 
+    <a style="color:white;font-size:1.5em;" href="{% url 'getting_started_symantec' %}">Register Credentials With Symantec VIP</a>
+
     <p> <br>Please Choose Your Preferred Second Factor Authentication Method </p>
     <br>
     <div class="option">
@@ -60,11 +76,11 @@
           <input type="radio" name="radio" id="radio1" class="radio" checked/>
           <label for="radio1">SMS</label>
       </div>
-
-      <div>
-          <input type="radio" name="radio" id="radio2" class="radio"/>
-          <label for="radio2">Voice Message</label>
-      </div>
+{##}
+{#      <div>#}
+{#          <input type="radio" name="radio" id="radio2" class="radio"/>#}
+{#          <label for="radio2">Voice Message</label>#}
+{#      </div>#}
 
       <div>
           <input type="radio" name="radio" id="radio3" class="radio"/>
@@ -79,10 +95,23 @@
     <br>
 
     {% include "six_digit_form.html" %}
+    <form class="sms code" name="sms_form" role="form" action="/check_sms/" method="post">
+        {% csrf_token %} <!-- CSRF token is rendered by Django in forms to avoid CSRF attacks -->
+
+     {{ forms }}
+
+        <input type="submit" class="btn btn-default" value="Submit SMS Code" onclick="window.location.href='/check_sms/'  "/>
+    </form>
+{#<input type="submit" class="btn btn-default" value="Submit SMS Code" onclick="window.location.href='/check_sms/'  "/>#}
+    <input type="submit" name="sendsms" class="btn btn-default" value="Send SMS" onclick="window.location.href='/send_sms/'  "/>
+    <br>
+    <br>
+
+
     <form class='btns' method="get" action = '.'>
     <br>
 
-        <button type="button" name='sendcode' onclick="window.location.href='/sent/' " >Send</button>
+        <button type="button" class="sendcode" name='sendcode' onclick="window.location.href='/sent/' " >Send</button>
 
         <button type="button" name= 'confirmcode' onclick="window.location.href='/result/' ">Confirm</button>
 

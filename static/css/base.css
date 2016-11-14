@@ -91,6 +91,28 @@ form input:focus {
   width: 300px;
   color: white;
 }
+.btn{
+  outline: 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  width: 300px;
+  border-radius: 3px;
+  padding: 10px 15px;
+  margin: 0 auto 10px auto;
+  display: block;
+  text-align: center;
+  font-size: 18px;
+  color: white;
+  font-weight: 300;
+}
+.btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.btn:focus {
+  background-color: rgba(255, 255, 255, 0.3);
+  width: 300px;
+  color: white;
+}
 button {
   outline: 0;
   background-color: darkslategray;
@@ -217,6 +239,14 @@ input.radio:empty {
 }
 .checkSMS:focus {
   background-color: rgba(255, 255, 255, 0.3);
+  width: 300px;
+  color: white;
+}
+#sendSMS:hover{
+  background-color: rgba(255, 255, 255, 0.2);
+}
+#sendSMS:focus{
+    background-color: rgba(255, 255, 255, 0.3);
   width: 300px;
   color: white;
 }

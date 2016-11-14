@@ -69,11 +69,14 @@ def logout_page(request):
 #     'home.html',
 #     { 'user': request.user, 'form': form }, csrfContext
 #     )
+@csrf_protect
 def home(request):
     forms = SMSForm()
     form = SixDigitForm()
 
     csrfContext = RequestContext(request)
+    variables = { 'form':form, 'forms':forms}
+    #return render(request, 'home.html', variables)
     return render_to_response(
     'home.html',
     { 'user': request.user, 'forms': forms, 'form':form}, csrfContext
@@ -105,16 +108,27 @@ def create_user(request):
             last_name = form.cleaned_data["last_name"]
             credential_id = form.cleaned_data["credential_id"]
             security_code = form.cleaned_data["security_code"]
+            phone_number = form.cleaned_data["phone_number"]
 
             user_created = management_services_object.createUser(id_generator(), email)
-            if ("0000" in str(user_created)):
-                added_cred = management_services_object.addCredential(id_generator(), email, credential_id, "STANDARD_OTP",\
+            if ("0000" in user_created.status and credential_id is not None and security_code is not None):
+                added_cred = management_services_object.addCredentialOtp(id_generator(), email, credential_id, "STANDARD_OTP",\
                                                                             security_code)
-                if ("0000" in str(added_cred)):
+                if (phone_number is not None):
+                    #phone_number_registered = management_services_object.registerBySMS(id_generator(), phone_number)
+
+                    added_sms_cred = management_services_object.addCredentialTrustedDevice(id_generator(), email, phone_number, "SMS_OTP", True)
+                    if ("0000" in added_sms_cred.status):
+                        #return HttpResponse("Added SMS Credential!")
+                        return HttpResponseRedirect("/home")
+                    else:
+                        return HttpResponse("Did not add SMS Credential to user..." +  str(added_sms_cred))
+
+                if ("0000" in added_cred.status):
                     return HttpResponse("GOOD!")
                 else:
                     return HttpResponse("Failure...")
-    pass
+    return HttpResponseRedirect("/home")
 
 def send_code(request):
         global transactionId
@@ -144,8 +158,8 @@ def send_code(request):
         #     return HttpResponse("Succeed")
 
         response = allServices.authenticateUserWithPushThenPolling("SampleBankApp_Push123", "SampleBankApp_Polling",
-                                                                   str(request.user),120)
-        if ("7000" in response):
+                                                                   str(request.user.email),120)
+        if (response.statusMessage =="Success"):
             return render_to_response("succeed.html")
 
         return HttpResponseRedirect("/home") # Probably should set a message so that we can see that it failed
@@ -155,22 +169,23 @@ def send_6_otp(request):
     queryurl = 'http://webdev.cse.msu.edu/~yehanlin/vip/vipuserservices-query-1.7.wsdl'
     queryclient = HTTPHandler.setConnection(queryurl)
     queryService = SymantecQueryServices(queryclient)
-    user_credentials = queryService.getUserInfo(id_generator(),request.user)[7]
-    for item in user_credentials:
-        credentialId = item[0]
+    user_credentials = queryService.getUserInfo(id_generator(),request.user)
+    # for item in user_credentials:
+    #     credentialId = item.credentialId
+
     if (request.method == "POST"):
         form = SixDigitForm(request.POST)
         if form.is_valid():
-            #post = form.save(commit=False)
+
             otp = form.cleaned_data["six_digit_code"]
-
-
-            userservices_url = 'http://webdev.cse.msu.edu/~morcoteg/Symantec/WSDL/vipuserservices-auth-1.4.wsdl'
+            userservices_url = 'http://webdev.cse.msu.edu/~morcoteg/Symantec/WSDL/vipuserservices-auth-1.7.wsdl'
             user_services_client = HTTPHandler.setConnection(userservices_url)
 
             user_service = SymantecUserServices(user_services_client)
-            authenticate_result = user_service.authenticateWithStandard_OTP(id_generator(), credentialId, otp)
-            if ("0000" in str(authenticate_result)):
+            #authenticate_result = user_service.authenticateWithStandard_OTP(id_generator(), credentialId, otp)
+            authenticate_result = user_service.authenticateUser(id_generator(), request.user.email, otp)
+
+            if ("0000" in authenticate_result.status):
                 return render_to_response("succeed.html")
             else:
                 return HttpResponse("Failure..." + str(request.user))
@@ -184,7 +199,7 @@ def confirm_code(request):
     urls = 'http://webdev.cse.msu.edu/~yehanlin/vip/vipuserservices-query-1.7.wsdl'
     clients = HTTPHandler.setConnection(urls)
     push_res = clients.service.pollPushStatus(requestId='13498345', transactionId=transactionId)
-    if("approved" in str(push_res)):
+    if("0000" in push_res.status):
         return HttpResponse("Succeed")
     else:
         return HttpResponse("Failed")
@@ -197,8 +212,9 @@ def send_sms(request):
     mgmtclient = HTTPHandler.setConnection(mgmturl)
     mgmtService = SymantecManagementServices(mgmtclient)
 
-    authenticate = mgmtService.sendOtpSMS(id_generator(), str(request.user), "15177757651")
+    authenticate = mgmtService.sendOtpSMS(id_generator(), str(request.user.email), "15177757651")
     return HttpResponseRedirect("/home")
+    #return HttpResponse(authenticate)
     # if (request.method == "POST"):
     #     form = SMSForm(request.POST)
     #     if form.is_valid():
@@ -227,24 +243,22 @@ def check_sms(request):
         queryclient = HTTPHandler.setConnection(queryurl)
         queryService = SymantecQueryServices(queryclient)
         user_info = queryService.getUserInfo(id_generator(), request.user)
-        user_credentials = user_info[7]
-        for item in user_credentials:
-            if "SMS" in item[1]:
-                phoneNum = item[0]
+        #user_credentials = user_info[7]
+        # for item in user_credentials:
+        #     if "SMS" in item[1]:
+        #         phoneNum = item[0]
         if (request.method == "POST"):
 
             form = SMSForm(request.POST)
             if form.is_valid():
                 # post = form.save(commit=False)
                 sms = form.cleaned_data["sms_code"]
-                authenticate_result = user_service.authenticateWithSMS("CheckTest", "15177757651", sms)
+                authenticate_result = user_service.authenticateCredentialWithSMS("CheckTest", "15177757651", sms)
 
 
-                if ("0000" in str(authenticate_result)):
+                if ("0000" in authenticate_result.status):
                     return render_to_response("succeed.html")
                 else:
-                    return HttpResponse("Failure..." + str(request.user) + phoneNum)
+                    return HttpResponse("Failure..." + str(request.user) + "15177757651")
         else:
             return HttpResponse("what?!")
-
-        pass
